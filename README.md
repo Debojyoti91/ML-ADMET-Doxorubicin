@@ -1,6 +1,6 @@
 **Repository: ML-ADMET-Doxorubicin**
 
-**Description:** This repository provides scripts and tools for assessing the ADMET properties of Doxorubicin, a common chemotherapy drug. The repository offers methods to fetch relevant target protein data, compute molecular descriptors, and use machine learning models to predict the drug's behavior in biological systems.
+**Description:** This repository is dedicated to the comprehensive assessment of the ADMET properties of Doxorubicin, as well as molecules structurally analogous to it. The tools herein facilitate the systematic retrieval of data pertaining to singular protein targets originating exclusively from human sources. Furthermore, these utilities enable the computation of intricate molecular descriptors, laying the foundation for the deployment of advanced machine learning models. These models are meticulously designed to predict the intricate behavior of the drug and its analogs within biological matrices.
 
 **Folder Structure:**
 1. **Protein**
