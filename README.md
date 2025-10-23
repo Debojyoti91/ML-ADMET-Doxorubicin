@@ -1,111 +1,85 @@
 # ML-ADMET-Doxorubicin
 
-## 🧬 Project Overview
+## Project Overview
 
-This repository presents a unified computational pipeline for discovering optimized anthracycline derivatives with improved pharmacokinetics and reduced toxicity. Centered on doxorubicin and its stereoisomers, this pipeline integrates **target-specific protein retrieval**, **structure-based ligand design**, **large-scale docking**, **molecular dynamics simulations**, and **machine learning–based ADME/ADMET prediction**.
+This repository presents a **unified, explainable machine learning and LLM framework** for predicting and interpreting the pharmacokinetic (ADME) and toxicity (ADMET) properties of **anthracycline derivatives**, with a primary focus on *doxorubicin* and its analogs.  
+It combines molecular feature generation, model training, and SHAP-based explainability into a **single modular and interactive workflow**.
 
-By systematically expanding the chemical space of anthracyclines and combining ligand-based modeling with biological target interactions, this repository facilitates the discovery of novel drug candidates with reduced cardiotoxicity and enhanced metabolic profiles.
+The pipeline leverages both **SMILES-based embeddings** and **physicochemical descriptors** to predict properties such as solubility, permeability, clearance, and hERG II inhibition risk. All models are fully interpretable, enabling transparent insights into molecular design and optimization.
 
 ---
 
 ## 📂 Folder Structure
 
 ### 1. `Protein/`
-Scripts to retrieve and analyze human protein targets relevant to doxorubicin:
-
-- `get_target_protein.py` – Retrieves target proteins using ChEMBL API.
-- `protein_descriptors.py` – Computes protein-specific descriptors for modeling.
-- `get_alphafold_3d.py` – Downloads AlphaFold 3D structures using UniProt IDs.
+Scripts to retrieve and analyze protein targets relevant to doxorubicin:
+- `get_target_protein.py` – Retrieves protein targets using the ChEMBL API.
+- `protein_descriptors.py` – Computes sequence- and structure-based descriptors.
+- `get_alphafold_3d.py` – Downloads AlphaFold 3D models from UniProt IDs.
 
 ### 2. `Molecule/`
-Scripts to process Doxorubicin analogs, generate new derivatives, and compute molecular descriptors:
+Scripts for molecular preparation, descriptor generation, and data augmentation:
+- `dox_similar.py` – Identifies structurally similar compounds to doxorubicin.
+- `molecule_data_augmentation.py` – Generates functionalized analogs (–NH₂, –OH, –CO, –CH₃).
+- `molecule_description_augmented.py` – Computes RDKit and pkCSM-based molecular descriptors.
 
-- `dox_similar.py` – Extracts structurally similar compounds from ChEMBL.
-- `molecule_data_augmentation.py` – Performs functional group modifications (–NH₂, –OH, –CO, –CH₃) for chemical diversity.
-- `molecule_description_augmented.py` – Calculates molecular descriptors and ADME estimates using RDKit and pkCSM.
+### 3. `Models/`
+Contains the core modeling modules and explainability scripts:
+- `adme_model.py` – Regression models for pharmacokinetic property prediction.
+- `admet_model.py` – Classification models for toxicity endpoints (e.g., hERG II).
+- `shap_pipeline.py` – SHAP-based interpretability pipeline for model explanation.
 
-### 3. `ML-ADME/`
-Scripts for training machine learning models to predict pharmacokinetics (ADME) and toxicity (ADMET):
+### 4. `interactive_main.py`
+The **main interactive runner** that unifies all modeling steps.  
+It handles:
+- Data loading and preprocessing  
+- ADME regression model training  
+- ADMET classification model training  
+- SHAP analysis and plot generation  
 
-- `best_model_adme.py` – Trains regression models on ADME endpoints using a hybrid feature set (RDKit + LLM embeddings).
-- `best_model_admet.py` – Implements classification models for hERG II inhibition risk prediction.
-
----
-
-## 🧪 Pipeline Summary
-
-### 🔬 Step 1: Protein Target Retrieval & Representation
-- Retrieve 201 **human-derived single-chain proteins** from ChEMBL.
-- Extract structural models from **AlphaFold** for docking and descriptor generation.
-
-### 🧪 Step 2: Ligand Design & Data Augmentation
-- Start with **doxorubicin and its 19 stereoisomers**.
-- Generate 222 diverse ligands using targeted functional group modifications.
-- Compute descriptors (logP, TPSA, H-bond donors/acceptors, rotatable bonds, etc.).
-
-### 🔄 Step 3: Docking & Molecular Dynamics
-- Perform **2,375 docking simulations** using AutoDock Vina (ligands × proteins).
-- Use **GROMACS** for 50 ns MD simulations on top ligand-protein complexes.
-- Analyze RMSD, RMSF, radius of gyration, SASA, and binding energy fluctuations.
-
-### 🤖 Step 4: Machine Learning Predictions
-- **ADME Regression**:
-  - Predict properties like solubility, permeability, clearance, half-life.
-  - Integrate **SMILES embeddings** from pretrained transformer models (PubChem10M SMILES-BPE).
-  - Train Random Forest models using hybrid features.
-
-- **ADMET Classification**:
-  - Focus on **hERG II inhibition** as cardiotoxicity marker.
-  - Train supervised models (Random Forest, XGBoost, Decision Trees).
-  - Achieved **>92% accuracy** with balanced precision and recall.
+### 5. `Doxorubicin_interactive.ipynb`
+An example notebook demonstrating end-to-end usage of the unified pipeline.  
+It provides an interactive environment for training, evaluation, and explainability visualization.
 
 ---
 
+## Architecture Overview
 
+### Inputs
+- Molecular SMILES strings  
+- Calculated RDKit descriptors and pkCSM properties  
+- Optionally, pretrained molecular embeddings (e.g., PubChem10M-BPE)
 
-## 🧰 Usage Guide
+### Pipeline Steps
+1. **Data Preparation** — Reads SMILES and computes descriptors.  
+2. **ADME Regression** — Predicts continuous properties (e.g., solubility, clearance, half-life).  
+3. **ADMET Classification** — Predicts toxicity endpoints such as hERG II inhibition.  
+4. **Model Interpretation** — Uses SHAP to identify key molecular features influencing predictions.  
+5. **Visualization** — Generates normalized (%SHAP) bar and violin plots for interpretability.
 
-### 🔧 Protein Analysis
+---
+
+##  How It Works
+
+| Step | Description | Key Files / Tools |
+|------|--------------|------------------|
+| **1. Data Preparation** | Generates descriptors and feature matrices from molecular SMILES | RDKit, pkCSM |
+| **2. ADME Modeling** | Trains the LLM model| `adme_model.py` |
+| **3. ADMET Modeling** | Classifies molecules by toxicity risk | `admet_model.py` |
+| **4. Explainability** | Computes SHAP values and plots feature importance | `shap_pipeline.py` |
+| **5. Interactive Execution** | Runs full workflow in one step | `interactive_main.py` |
+
+---
+
+##  Usage Guide
+
+###  Protein Analysis
 ```bash
-# Fetch target proteins
+# Retrieve target proteins
 python Protein/get_target_protein.py
 
 # Generate protein descriptors
 python Protein/protein_descriptors.py
 
-# Download 3D structures via AlphaFold
+# Download AlphaFold 3D structures
 python Protein/get_alphafold_3d.py
-coding standards and are thoroughly documented.
-
-
-
-# Find similar compounds to Doxorubicin
-python Molecule/dox_similar.py
-
-# Apply functional group modifications
-python Molecule/molecule_data_augmentation.py
-
-# Compute descriptors and ADME features
-python Molecule/molecule_description_augmented.py
-
-
-
-# ADME property prediction (regression)
-python ML-ADME/best_model_adme.py
-
-# ADMET toxicity classification (hERG II)
-python ML-ADME/best_model_admet.py
-
-
-🤝 Contributions
-
-Contributions are welcome! You may:
-
-Add new predictive models (e.g., for liver toxicity or bioavailability).
-Integrate molecular generation (e.g., using reinforcement learning).
-Optimize hyperparameters or extend LLM embeddings.
-Improve documentation or pipeline modularity.
-Please follow standard coding practices and provide comments for reproducibility.
-
-
-
