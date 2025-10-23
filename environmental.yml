@@ -1,0 +1,48 @@
+name: doxorubicin-adme/admet
+channels:
+  - defaults
+  - conda-forge
+  - pytorch
+  - pyg  # for PyTorch Geometric
+dependencies:
+  # Core Python
+  - python=3.11
+  - pip
+
+  # Core scientific stack
+  - numpy
+  - pandas
+  - scikit-learn
+  - scipy
+  - matplotlib
+  - seaborn
+  - joblib
+
+  # Machine learning / deep learning
+  - pytorch
+  - torchvision
+  - torchaudio
+  - cudatoolkit=11.8  # (omit if running on CPU)
+  - pyg  # installs torch-geometric dependencies
+
+  # Chemistry / cheminformatics
+  - rdkit
+  - openbabel
+
+  # Explainability / visualization
+  - shap
+  - tqdm
+  - ipython
+  - jupyter
+
+  # Optional utilities
+  - requests
+  - jsonschema
+
+  # Ensure pip-based packages (for SHAP/ML explainers & plotting)
+  - pip:
+      - lime
+      - xgboost
+      - lightgbm
+      - catboost
+      - plotly
